@@ -1,7 +1,7 @@
 # Bounce
 A traversal-platform game that uses basic physics and environmental variables as obstacles to the player.
 
-# NOTE: THIS GAME REQUIRES THE PYGAME LIBRARY TO WORK PROPERLY
+# NOTE: THIS GAME REQUIRES THE PYGAME LIBRARY INSTALLED IN PYTHON 3.6+ TO WORK PROPERLY
 
 The player controls the green square, attempting to jump from platform to platform to reach a gold square.
 
