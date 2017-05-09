@@ -3,6 +3,8 @@ A traversal-platform game that uses basic physics and environmental variables as
 
 # NOTE: THIS GAME REQUIRES THE PYGAME LIBRARY INSTALLED IN PYTHON 3.6+ TO WORK PROPERLY
 
+Main file: Bounce.py
+
 The player controls the green square, attempting to jump from platform to platform to reach a gold square.
 
 Reaching the gold square advances 1 level (+100 pts).
