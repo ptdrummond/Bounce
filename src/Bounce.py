@@ -377,8 +377,9 @@ while not quit_game: #start level
         
         
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: sys.exit()
-            elif event.type == KEYDOWN:#set keydown booleans here
+            #if event.type == pygame.QUIT:
+            #    sys.exit()
+            if event.type == KEYDOWN:#set keydown booleans here
                 if(event.key==K_d): #move right
                     right = True
                 if(event.key==K_a): #move left
