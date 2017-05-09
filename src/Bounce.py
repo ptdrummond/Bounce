@@ -31,13 +31,21 @@ Fall and you die -10 points
 @author: Paul T Drummond
 '''
 
-import sys
-import pygame
-from pygame.locals import *
-from random import randint
-from math import sqrt
+CHEAT_MODE = False #allows infinite jump to test traversal and background scrolling
 
+import sys
+print(sys.path)
+import pygame
+print(pygame.__path__)
+from pygame.locals import *
+#from random import randint
+#from math import sqrt
+
+##########################################
 #initialize window and constants
+##########################################
+
+#size, colors
 size = width, height = 1280, 720
 black = 0, 0, 0 #background color
 red = 255,0,0 #platform and wall color
@@ -45,6 +53,7 @@ blue = 0,0,255 #enemy color
 green = 0,255,0 #player color
 gold = 255,215,0 #goal color
 
+#physics
 FRAMERATE = 60 #frames/second
 METER = (height/72) #size of a meter relative to screen unit m
 LEVELSPEED = METER #horizontal speed of player movement and camera units: m*(1/s)=m/s
@@ -53,27 +62,35 @@ JUMP_VEL = 2.3*METER #speed players jump at units: m*(1/s)=m/s
 GRAVITY = 10*(METER)/FRAMERATE #gravity increment unit: (m/s)*(1/s)=m/(s^2)
 MAX_Y_VELOCITY = JUMP_VEL*2 #terminal velocity
 
+#player
 FALL_DAMAGE = 1 #damage from falling off the screen
+MAX_HEALTH = 1
 
+#game
 LEVEL = 1 #current game level
 MAX_LEVELS = 4 #number of levels in game
 
-MAX_HEALTH = 1
-CHEAT_MODE = False #allows infinite jump to test traversal and background scrolling
-
+#create window and begin
 screen = pygame.display.set_mode(size)
-
 timer = pygame.time.Clock() #timer for the game update
 
+#SOUNDS (TODO)
 #initialize pygame mixer and load level 1 song
 #pygame.mixer.init()
 #pygame.mixer.music.load("Audio\\Game1.ogg")
 #pygame.mixer.music.play(-1)
 
+#Entity
+#main entity class all entities inherit from
+#TODO: 1. define position here, maybe velocity values and rectangle
+#TODO: 2. define universal disp (render) method
 class Entity(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
+#goal
+#Class describing the goal block. Contact with this block by the player advances a level
+#This is the main objective of the game
 class goal(Entity):
     def __init__(self,x,y):
         Entity.__init__(self)
@@ -119,6 +136,8 @@ class bounce(Entity):
         self.rect.topleft = (self.x,self.y)
         pygame.draw.rect(screen,blue,self.rect,0)
 
+#block
+#Solid objects the player can land on
 #platforms and walls should all be stationary
 class block(Entity):
     def __init__(self,x,y,w,h): #x,y coords and width,height, as these are used for walls and platforms
@@ -132,7 +151,10 @@ class block(Entity):
         self.rect.topleft = (self.x,self.y)
         pygame.draw.rect(screen,red,self.rect,0)
 
+#levelLayout
 #determines level layout, decides where to place blocks
+#TODO: 1. change format of levels to read from file
+#TODO: 2. add more levels
 class levelLayout():
     def __init__(self,levelnum):
         #self.platforms = [block(METER,5*METER,4*METER,height),block(METER,5*METER,width-2*METER,4*METER),block(width-5*METER,5*METER,4*METER,height)]
@@ -207,9 +229,9 @@ class levelLayout():
         self.end.disp()
 
 
-layout = levelLayout(LEVEL)
-
-        
+#player
+#The Entity controlled by the player
+#TODO isolate collision routine, it probably doesn't belong here.
 class player(Entity):
     def __init__(self):
         Entity.__init__(self)
@@ -360,25 +382,30 @@ class player(Entity):
         scoretext=font.render("Score: "+str(self.score)+"         Level: "+str(LEVEL)+"/"+str(MAX_LEVELS)+"     Song: ---    A:Left  D:Right    SPACEBAR:Jump", 1,(255,0,0))
         screen.blit(scoretext,(20,20))
 
+
+#initialize first level
+layout = levelLayout(LEVEL)
+
 #set control booleans
 left = False
 right = False
 jump = False
 player1 = player()
 
+#set fonts for game
 pygame.font.init()
 font=pygame.font.Font(None,30)
 
+#draw initial black rectangle size of the screen
 bg_rect = pygame.Rect(0,0,width,height)
 pygame.draw.rect(screen,black,bg_rect,0)
 
+#set quit boolean and begin game loop
 quit_game = False
 while not quit_game: #start level
         
-        
+        #Get keyboard input on cycle
         for event in pygame.event.get():
-            #if event.type == pygame.QUIT:
-            #    sys.exit()
             if event.type == KEYDOWN:#set keydown booleans here
                 if(event.key==K_d): #move right
                     right = True
@@ -388,7 +415,6 @@ while not quit_game: #start level
                     jump = True
                 if(event.key == K_ESCAPE):
                     quit_game = True
-                    #sys.exit()
                 if(event.key == K_r):
                     player1.reachedgoal = True
             elif event.type == KEYUP:#set keyup booleans here
@@ -412,9 +438,9 @@ while not quit_game: #start level
         if(player1.reachedgoal):
             LEVEL += 1
             if(LEVEL > MAX_LEVELS):
-                LEVEL = 1
+                LEVEL = 1 #restarts the game maintaining score. TODO: implement NG+ feature? maybe speed the game up each time
             layout = levelLayout(LEVEL)
-            #player1 = player()
+            
             player1.respawn()
             player1.score += 100
             player1.reachedgoal = False
