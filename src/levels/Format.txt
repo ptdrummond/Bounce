@@ -1,0 +1,22 @@
+Object types:
+0 - spawn platform (one only)
+1 - solid platform
+2 - bounce block, also has mode identifer on the end [0-4]
+3 - goal block (one only)
+
+Each row = 1 object
+Bounce block (2) modes: 
+	0=stationary; 
+	1=moves side to side; 
+	2=moves vertically; 
+	3=moves diagonal /; 
+	4=moves diagonal \
+
+NOTE coordinates are in meters, not pixels!
+ALSO y-coords translate to height-y!
+
+Formats (number order):
+0 x y width height
+1 x y width height
+2 x y [0-4]
+3 x y
