@@ -158,63 +158,34 @@ class block(Entity):
 class levelLayout():
     def __init__(self,levelnum):
         #self.platforms = [block(METER,5*METER,4*METER,height),block(METER,5*METER,width-2*METER,4*METER),block(width-5*METER,5*METER,4*METER,height)]
-        self.spawn = block(12*METER,height-(12*METER),12*METER,5*METER) #spawn platform
-        #self.platforms.append(self.spawn)
-        self.platforms = [self.spawn]
-        if(levelnum == 1):
-            #set platform locations
-            
-            self.platforms.append(block((36*METER),height-(12*METER),12*METER,5*METER))
-            self.platforms.append(block((108*METER),height-(12*METER),12*METER,5*METER))
-            self.platforms.append(block((80*METER),height-(40*METER),12*METER,5*METER))
-            self.platforms.append(block((20*METER),height-(40*METER),10*METER,4*METER))
-            #set bounceblock locations
-            #bounce type: 0=stationary; 1=moves side to side; 2=moves vertically; 3=moves diagonal /; 4=moves diagonal \
-            self.bounceblocks = [bounce(76*METER,height-16*METER,0)]
-            self.bounceblocks.append(bounce(104*METER,height-24*METER,3))
-            self.bounceblocks.append(bounce(104*METER,height-35*METER,0))
-            self.bounceblocks.append(bounce(55*METER,height-40*METER,1))
-            #set goal location
-            self.end = goal(20*METER,height-44*METER)
-        elif(levelnum ==2):
-            
-            self.platforms.append(block((108*METER),height-(12*METER),12*METER,5*METER))
-            
-            self.bounceblocks = [bounce(40*METER,height-16*METER,0)]
-            self.bounceblocks.append(bounce(60*METER,height-28*METER,2))
-            self.bounceblocks.append(bounce(80*METER,height-36*METER,4))
-            
-            self.end = goal(116*METER,height-16*METER)
-        elif(levelnum ==3):
-            
-            self.platforms.append(block((108*METER),height-50*METER,12*METER,5*METER))
-            self.platforms.append(block((34*METER),height-(46*METER),10*METER,4*METER))
-            self.platforms.append(block((108*METER),height-(12*METER),12*METER,5*METER))
-            
-            self.bounceblocks = [bounce(60*METER,height-36*METER,1)]
-            self.bounceblocks.append(bounce(30*METER,height-30*METER,4))
-            self.bounceblocks.append(bounce(96*METER,height-28*METER,2))
-            
-            self.end = goal(116*METER,height-54*METER)
-        elif(levelnum ==4):
-            
-            self.platforms.append(block((104*METER),height-(12*METER),16*METER,5*METER))
-            
-            self.bounceblocks = [bounce(40*METER,height-16*METER,0)]
-            self.bounceblocks.append(bounce(50*METER,height-30*METER,0))
-            self.bounceblocks.append(bounce(84*METER,height-20*METER,0))
-            self.bounceblocks.append(bounce(60*METER,height-40*METER,0))
-            
-            self.bounceblocks.append(bounce(96*METER,height-26*METER,2))
-            self.bounceblocks.append(bounce(99*METER,height-26*METER,2))
-            self.bounceblocks.append(bounce(102*METER,height-26*METER,2))
-            self.bounceblocks.append(bounce(105*METER,height-26*METER,2))
-            self.bounceblocks.append(bounce(108*METER,height-26*METER,2))
-            self.bounceblocks.append(bounce(111*METER,height-26*METER,2))
-            self.bounceblocks.append(bounce(114*METER,height-26*METER,2))
-            self.bounceblocks.append(bounce(117*METER,height-26*METER,2))
-            
-            self.end = goal(116*METER,height-16*METER)
+        
+        self.spawn = None
+        self.platforms = []
+        self.bounceblocks = []
+        self.end = None
+        
+        ##NEW read layout from file here and create platform lists
+        #TODO change from text files to JSON format!
+        #TODO create graphical level-maker tool!
+        #Open file
+        f = open("levels\\Level_"+str(levelnum)+".txt", 'r')
+        for line in f:
+            line = line.split()
+            if line:
+                line = [int(i) for i in line]
+                blockType = line.pop(0)
+                if(blockType == 0): #spawn platform
+                    self.spawn = block(line.pop(0)*METER,height-(line.pop(0)*METER),line.pop(0)*METER,line.pop(0)*METER)
+                    self.platforms.append(self.spawn)
+                elif(blockType == 1): #solid platform
+                    self.platforms.append(block(line.pop(0)*METER,height-(line.pop(0)*METER),line.pop(0)*METER,line.pop(0)*METER))
+                elif(blockType == 2): #bounce blocks
+                    self.bounceblocks.append(bounce(line.pop(0)*METER,height-(line.pop(0)*METER),line.pop(0)))
+                elif(blockType == 3):
+                    self.end = goal(line.pop(0)*METER,height-(line.pop(0)*METER))
+        #close the file            
+        f.close()
+        
             
         
     def update(self):
@@ -406,6 +377,8 @@ while not quit_game: #start level
         
         #Get keyboard input on cycle
         for event in pygame.event.get():
+            if event.type == pygame.QUIT: #needed on onscreen x button
+                sys.exit()
             if event.type == KEYDOWN:#set keydown booleans here
                 if(event.key==K_d): #move right
                     right = True
