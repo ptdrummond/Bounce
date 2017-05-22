@@ -82,20 +82,20 @@ timer = pygame.time.Clock() #timer for the game update
 
 #Entity
 #main entity class all entities inherit from
-#TODO: 1. define position here, maybe velocity values and rectangle
+#TODO: 1. define velocity values and rectangle?
 #TODO: 2. define universal disp (render) method
 class Entity(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,x,y):
         pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
 
 #goal
 #Class describing the goal block. Contact with this block by the player advances a level
 #This is the main objective of the game
 class goal(Entity):
     def __init__(self,x,y):
-        Entity.__init__(self)
-        self.x = x
-        self.y = y  
+        Entity.__init__(self,x,y)
         self.rect = pygame.Rect(self.x,self.y,4*METER,4*METER)
         
     def disp(self):
@@ -105,9 +105,7 @@ class goal(Entity):
 #character bounces off of these blocks        
 class bounce(Entity):
     def __init__(self,x,y,m): #x,y starting coords, m is which mode it moves in (0-4)
-        Entity.__init__(self)
-        self.x = x
-        self.y = y
+        Entity.__init__(self,x,y)
         self.x0 = x #origin, used for when scrolling side to side
         self.y0 = y
         self.xvel = 0
@@ -141,11 +139,9 @@ class bounce(Entity):
 #platforms and walls should all be stationary
 class block(Entity):
     def __init__(self,x,y,w,h): #x,y coords and width,height, as these are used for walls and platforms
-        Entity.__init__(self)
+        Entity.__init__(self,x,y)
         self.rect = pygame.Rect(x,y,w,h)
         pygame.draw.rect(screen,red,self.rect,0)
-        self.x = x
-        self.y = y
         
     def disp(self):
         self.rect.topleft = (self.x,self.y)
@@ -205,11 +201,9 @@ class levelLayout():
 #TODO isolate collision routine, it probably doesn't belong here.
 class player(Entity):
     def __init__(self):
-        Entity.__init__(self)
+        Entity.__init__(self,layout.spawn.x,layout.spawn.y-3*METER)
         self.xvel = 0
         self.yvel = 0
-        self.x = layout.spawn.x
-        self.y = layout.spawn.y-3*METER
         self.x0 = self.x #for spawn in current level
         self.y0 = self.y
         self.onground = False
